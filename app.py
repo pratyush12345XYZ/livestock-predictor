@@ -273,6 +273,9 @@ def predict():
                 raw_inputs.append(float(val))
 
         input_df = pd.DataFrame([raw_inputs], columns=results['selected_features'])
+        # Ensure all columns are numeric for the model
+        for col in input_df.columns:
+            input_df[col] = pd.to_numeric(input_df[col], errors='coerce').fillna(0)
         
         # Scale for KNN if needed, but here we use RF for main prediction as before
         rf = results['rf_model']
@@ -284,7 +287,7 @@ def predict():
         return render_template('prediction.html', data=results, prediction_text=f'Result: {result}')
     except Exception as e:
         import traceback
-        print(traceback.format_exc())
+        traceback.print_exc()
         return render_template('prediction.html', data=results, prediction_text=f'Error: {str(e)}')
 
 @app.route('/get_random_data')
